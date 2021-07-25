@@ -1,5 +1,7 @@
 # Some of my favourite decorators
 
+Comments and corrections to [J. M. F. Tsang](j.m.f.tsang@cantab.net).
+
 In this piece I describe how function decorators work, and give some examples of
 little useful decorators that I like to use all the time.
 

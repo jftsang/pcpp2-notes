@@ -2,6 +2,8 @@
 
 Comments and corrections to [J. M. F. Tsang](j.m.f.tsang@cantab.net).
 
+---
+
 ## Introduction
 
 Design patterns are general, abstract, high-level strategies for structuring an

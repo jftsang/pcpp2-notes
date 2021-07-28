@@ -1,5 +1,9 @@
 # Interprocess Communication
 
+Comments and corrections to [J. M. F. Tsang](j.m.f.tsang@cantab.net).
+
+---
+
 -   multiprocessing — Process-based parallelism
 -   threading — Thread-based parallelism
 -   subprocess — Subprocess management

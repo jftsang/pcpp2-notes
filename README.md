@@ -2,6 +2,8 @@
 
 Comments and corrections to [J. M. F. Tsang](j.m.f.tsang@cantab.net).
 
+---
+
 Just a collection of useful or interesting (or simply cute) things I've learnt
 about Python.
 

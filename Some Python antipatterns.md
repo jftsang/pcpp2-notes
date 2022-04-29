@@ -123,6 +123,36 @@ else:
 ```
 
 
+## Unnecessary looping
+### Prefer comprehensions over loops
+```python
+# instead of
+filtered_squares = []
+for x in xs:
+    if predicate(x):
+	    filtered_squares.append(x ** 2)
+
+# prefer
+filtered_squares = [x ** 2 for x in xs if predicate(x)]
+```
+
+### Using `map` and `filter`
+For large operations, `map` and `filter` can be more memory-efficient than a comprehension, since they produce iterators instead of storing the entire output in memory.
+```python
+filtered_squares_iter = map(
+	 lambda x: x ** 2,
+	 filter(predicate, xs)
+)
+```
+You can use the iterable in a `for` loop or a comprehension.
+
+Alternatively, the returned object can be converted into a list (or set):
+```python
+filtered_squares = list(filtered_squares_iter)
+```
+but this loses the advantage of memory efficiency.
+
+
 ## Mutability
 ### Mutable parameters
 Avoid unnecessarily passing mutable objects, such as dictionaries, into a function.
@@ -152,17 +182,18 @@ dic['answer'] = calculate_answer(dic)
 This makes the assignment more explicit.
 
 ### Default mutable parameters
+If your function does need to mutate its input then be careful of using a mutable as its default parameter. Instead, use `None`.
 ```python
 # instead of
 def f(xs=[]):
-    do_something(xs)
+	xs.append(1)
 
 # prefer
 def f(xs=None):
     if xs is None:
         xs = []
 
-	do_something(xs)
+	xs.append(1)
 ```
 
 

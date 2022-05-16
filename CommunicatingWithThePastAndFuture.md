@@ -84,13 +84,14 @@ these tools effectively.
 
 Some context about myself: I'm a software engineer of about three years;
 my day job title is 'Senior Data Engineer', meaning I spend a lot of
-time thinking about data pipelines and processes. I moved into the world
-of software engineering from a stint in academia; my research background
-was in mathematical and computational physics.  I'm a longtime Wikipedia
-reader and sometime Wikipedia contributor, and spent too much time
-reading the Wikipedia policies and [manual of style](https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style).
-We use the Atlassian products (Jira, Confluence) at work, and Slack as
-the primary means of live communication.
+time thinking about data pipelines and processes.  We use the Atlassian
+products (Jira, Confluence) at work, and Slack as the primary means of
+live communication.  I moved into the world of software engineering from
+a stint in academia; my research background was in mathematical and
+computational physics.  I'm a longtime Wikipedia reader and sometime
+Wikipedia contributor, and spent too much time reading the Wikipedia
+policies and [manual of style](https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style).
+Some of the following is a condensation of the Wikipedia MoS.
 
 
 ## The Golden Rule
@@ -106,7 +107,28 @@ These are _proposals_, not rules. They reflect _my_ opinions, shaped by
 my background and experience. Your mileage may vary.
 
 
-## Using wiki software
+## General practices
+
+### Prefer open channels
+
+Communications in the open (Slack, Discord, IRC, mailing lists, Usenet,
+forums, _etc._) allow passers-by to chip in with their knowledge and
+advice. Hopefully, yours is a culture where this is welcome.  They also
+maintain an org-wide (or even globally) accessible archive of the
+communications, in case the participants eventually leave.
+
+This is especially important in the age of online working, when
+coworkers are no longer to simply join a conversation that they
+overhear.
+
+On the other hand, emails are more difficult to search, and depending on
+the email provider may be ephemeral. They are closed to the participants
+of an email thread.
+
+This must _never_ trump respect for the privacy of others.
+
+
+## Using knowledge bases
 
 ### Is it the right tool?
 
@@ -117,6 +139,10 @@ might describe the current state of play for an ongoing project, it
 should identify this as a snapshot taken at a certain time. Likewise, it
 may express the opinions of individuals (usually the author), but these
 should be identified as opinions.
+
+(Whether the author of a page has the authority to establish her writing
+as 'the truth' is a separate question, but in any case the author should
+be clear to mark her opinions as such.)
 
 For dynamic information following the progress of a project, an issue
 tracker such as Jira is usually more appropriate.

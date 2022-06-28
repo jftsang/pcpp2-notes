@@ -23,53 +23,108 @@ Wikipedia says ([permalink](https://en.wikipedia.org/w/index.php?title=Software_
 > solve a problem that can be used in many different situations. Design patterns
 > are formalized best practices that the programmer can use to solve common
 > problems when designing an application or system.
-> 
+>
 > Object-oriented design patterns typically show relationships and interactions
 > between classes or objects, without specifying the final application classes
 > or objects that are involved. Patterns that imply mutable state may be
 > unsuited for functional programming languages. Some patterns can be rendered
 > unnecessary in languages that have built-in support for solving the problem
 > they are trying to solve, and object-oriented patterns are not necessarily
-> suitable for non-object-oriented languages. 
+> suitable for non-object-oriented languages.
 
 ## Singleton pattern
 
 A **singleton** is a class of which there may be at most one instance throughout
 the application; and all parts of the application must have access to that one
-instance. 
+instance.
 
 ### Why
 
-Singletons provide an alternative to global variables and global functions. This
-makes them useful for holding information such as application-wide settings.
-The main benefit is to provide global access to values without introducing extra
-names into the global namespace.
+Configurations or resources (_e.g._ database or network connections, disk caches) are often held in global variables or functions, to ensure consistency across usages as well as minimizing expensive operations, _e.g._ by making only a single database connection and reusing it in different areas. To avoid cluttering the module namespace, we can encapsulate them into a class that contains these variables and functions, and we make this class a singleton so that these resources are preserved rather than creating a new instance each time it is needed.
 
 ### How
-
-A very simple example of a singleton class in Python:
+The key is to have an instance of the class itself as one of its members, and to
+An example of a singleton class in Python:
 ```python
-class Singleton:
+class SingletonExample:
     __instance = None
-    def __new__(cls, *args):
-        if cls.__instance is None:
-            cls.__instance = object.__new__(cls, *args)
-        return cls.__instance
-```
-The use of `__new__` instead of `__init__` is explained at [this Stack Overflow
-answer](https://stackoverflow.com/a/4859181).
 
+    def __new__(cls):
+        if cls.__instance is None:
+            cls.__instance = object.__new__(cls)
+
+        return cls.__instance
+
+    # then other methods
+```
 This class, `Singleton`, has a class member `Singleton.__instance` that is
 initialised to `None`. Then when there is an attempt to create an instance of
 `Singleton`, the constructor `__new__` actually creates an instance if and only
 if such an instance does not already exist. Otherwise, it just returns the
-existing instance. Thus,
+existing instance. Thus:
 ```python
-s1 = Singleton()
-s2 = Singleton()
-assert s1 == s2
+s1 = SingletonExample()
+s2 = SingletonExample()
+assert s1 is s2  # not just s1 == s2
 ```
-The key is to have an instance of the class itself as one of its members.
+Since `s1` and `s2` are actually the same instance, mutating `s1` will similarly mutate `s2`. Note that singleton-ness does _not_ imply that the class is immutable!
+```python
+s1.foo = 'boo'
+print(s2.foo)  # doesn't AttributeError
+```
+
+Some technical points:
+  1. The use of `__new__` instead of `__init__` is explained at [this Stack Overflow answer](https://stackoverflow.com/a/4859181).
+  2. When subclassing, instead of `object.__new__` it may be more
+     appropriate to call `super().__new__` (which in turn may call
+     `object.__new__`).  However, [you probably shouldn't be subclassing a singleton class](https://softwareengineering.stackexchange.com/questions/372196/is-it-worthy-subclassing-a-singleton-class).
+  3. The use of double leading underscores in the name `__instance`
+     triggers [name mangling](https://stackoverflow.com/a/34903236),
+     essentially so that subclasses of `SingletonExample` will have have a
+     different instance. But again, consider whether subclassing is
+     really necessary.
+
+### Application
+```python
+import warnings
+import psycopg2
+
+class Connection:
+    __instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            print(f'Initializing a new connection with {args} and {kwargs}')
+            cls.__instance = psycopg2.connect(*args, **kwargs)
+            # For demonstration purposes you can just use a dict
+            # cls.__instance = kwargs
+
+        else:
+            if args or kwargs:
+                warnings.warn(
+                    'A connection has already been initialized, '
+                    'so new arguments are ignored.'
+                )
+            print('Reusing an already-initialized connection instance')
+
+
+        return cls.__instance
+```
+
+### Alternatives
+When dealing with only one or two expensive functions and using names at the module namespace is not a problem (_e.g._ if the connection class is in a separate module), then it is simpler to decorate those functions with `@functools.lru_cache`.
+```python
+from functools import lru_cache
+import psycopg2
+
+@lru_cache()
+def connect(*args, **kwargs):
+    return psycopg2.connect(*args, **kwargs)
+```
+
+
+## Delegate pattern
+
 
 
 ## Factory pattern

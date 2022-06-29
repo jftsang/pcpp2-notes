@@ -287,64 +287,122 @@ dine(cook_salmon)
 Note that we pass in the functions themselves as arguments; we don't do
 `dine(cook_spaghetti())`.
 
-## Facade pattern
 
-Wikipedia says of the facade pattern ([permalink](https://en.wikipedia.org/w/index.php?title=Facade_pattern&oldid=996427370)):
+## Facade pattern and encapsulation
 
-> Analogous to a facade in architecture, a **facade** is an object that serves as a
-> front-facing interface masking more complex underlying or structural code. A
-> facade can improve the readability and usability of a software library by
-> **masking interaction with more complex components behind a single (and often
-> simplified) API**. [...]
-> 
-> Developers often use the facade design pattern when a system is very complex
-> or difficult to understand because the system has many interdependent classes
-> or because its source code is unavailable. This pattern hides the complexities
-> of the larger system and provides a simpler interface to the client. It
-> typically involves a single wrapper class that contains a set of members
-> required by the client. These members access the system on behalf of the
-> facade client and hide the implementation details.
+Wikipedia says of the **facade pattern**
+([permalink](https://en.wikipedia.org/w/index.php?title=Facade_pattern&oldid=996427370)):
 
-An API is a common example of a facade: the client does not need to know (and
-perhaps should not be permitted to know) the machinery of the server as it
-processes a request.
+> Analogous to a facade in architecture, a **facade** is an object that
+> serves as a front-facing interface masking more complex underlying or
+> structural code. A facade can improve the readability and usability of
+> a software library by **masking interaction with more complex
+> components behind a single (and often simplified) API**. [...]
+>
+> Developers often use the facade design pattern when a system is very
+> complex or difficult to understand because the system has many
+> interdependent classes or because its source code is unavailable. This
+> pattern hides the complexities of the larger system and provides a
+> simpler interface to the client. It typically involves a single
+> wrapper class that contains a set of members required by the client.
+> These members access the system on behalf of the facade client and
+> hide the implementation details.
 
-### Encapsulation
+An API is a common example of a facade: the client does not need to know
+the machinery of the server as it processes a request, and in a
+properly-designed API the behaviour of the client code should depend
+only on the behaviour of the API functions.
 
-The facade pattern is closely linked to the notions of encapsulation: the
-properties of an encapsulated object may be queried or set, but the underlying
-implementation of those properties should not be exposed.
+The facade pattern is closely linked to the principle of
+**encapsulation**: that a properly-encapsulated object's properties may
+be queried or set, but the underlying implementation or storage should
+not be exposed. In this way, the implementation of an object may be
+freely changed without affecting its usage or behaviour.
 
-Consider for example:
+Consider for example a class `Point3D`, representing a point in space.
+One possibility is to describe the point in terms of its Cartesian
+coordinates:
 ```python
-class Point2D():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        
-    def distance_from_origin(self):
-        """Return the distance of the point from the origin."""
-        return (self.x ** 2 + self.y ** 2) ** 0.5
-``` 
-In this class, the position of the point has been stored in terms of two
-separate variables for the Cartesian coordinates of the point. If we are
-interested in the distance of the point from the origin, we can call
-```python
-p = Point2D(3, 4)
-print(p.distance_from_origin())
+@dataclass
+class Point3D:
+    x: float
+    y: float
+    z: float
 ```
-The distance of a point from the origin is a geometric property that does not
-depend on how the point `p` is represented (it could alternatively be stored as
-a complex number, or as a 2-tuple, or in terms of polar coordinates, maybe even
-queried from a database somewhere) By defining a method `distance_from_origin`,
-we can change how we internally represent `p` and then change the definition of
-`distance_of_origin`, without needing to change any code that uses this method.
 
-If instead the other code calculated the same quantity directly:
+Suppose we want to work out the distance of a point from the origin.
+This can be done by defining a function
 ```python
-print((p.x ** 2 + p.y ** 2) ** 0.5)
+from math import hypot
+
+def distance_from_origin(point: Point3D) -> float:
+    return hypot(point.x, point.y, point.z)
 ```
-this code would need to be changed if the way `p` is stored is changed.
+
+However, our user code now depends on the instance variables `.x`, `.y`
+and `.z`: both in the definition of `distance_from_origin`, as well as
+in a constructor expression such as `Point3D(3, 6, 1)`, where the
+arguments will be treated as Cartesians.  What if one day we decide to
+represent points in terms of their spherical or cylindrical polar
+coordinates instead, or indeed some other curvilinear system?
+
+There are several steps that will make the interface to `Point3D` more
+agnostic to its implementation. First, we can provide the distance from
+the origin as a `@property`, alongside any other coordinates:
+```python
+@dataclass
+class Point3D:
+    ...
+
+    @property
+    def r(self):
+        """Radial coordinate in sphericals"""
+        return hypot(self.x, self.y, self.z)
+
+    @property
+    def rho(self):
+        """Radial coordinate in cylindricals"""
+        return hypot(self.x, self.y)
+
+    @property
+    def theta(self): ...
+
+    @property
+    def phi(self): ...
+```
+In this way, instead of `distance_from_origin` we now simply need
+`point.r`.
+
+Next, we provide constructor methods for creating `Point3D` objects from
+different coordinate systems, *including* from Cartesians.
+```python
+@dataclass
+class Point3D:
+    ...
+
+    @classmethod
+    def from_cartesians(cls, x, y, z):
+        return cls(x=x, y=y, z=z)
+
+    @classmethod
+    def from_sphericals(cls, r, theta, phi):
+        return cls(
+            x=r * sin(theta) * cos(phi),
+            y=r * sin(theta) * sin(phi),
+            z=r * cos(theta),
+        )
+```
+A call to `Point3D.from_cartesians(3, 6, 1)` is now explicit that those
+numbers represent Cartesian coordinates.
+
+Furthermore, we can use
+```python
+@dataclass(kw_only=True)
+class Point3D:
+    ...
+```
+to enforce that the arguments to the default constructor `__init__` must
+be specified as keyword arguments, to further reduce ambiguity.
 
 
 ## Proxy pattern

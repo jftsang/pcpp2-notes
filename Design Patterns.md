@@ -40,9 +40,18 @@ instance.
 
 ### Why
 
-Configurations or resources (_e.g._ database or network connections, disk caches) are often held in global variables or functions, to ensure consistency across usages as well as minimizing expensive operations, _e.g._ by making only a single database connection and reusing it in different areas. To avoid cluttering the module namespace, we can encapsulate them into a class that contains these variables and functions, and we make this class a singleton so that these resources are preserved rather than creating a new instance each time it is needed.
+Configurations or resources (_e.g._ database or network connections,
+disk caches) are often held in global variables or functions, to ensure
+consistency across usages as well as minimizing expensive operations,
+_e.g._ by making only a single database connection and reusing it in
+different areas. To avoid cluttering the module namespace, we can
+encapsulate them into a class that contains these variables and
+functions, and we make this class a singleton so that these resources
+are preserved rather than creating a new instance each time it is
+needed.
 
 ### How
+
 The key is to have an instance of the class itself as one of its members, and to
 An example of a singleton class in Python:
 ```python
@@ -67,7 +76,9 @@ s1 = SingletonExample()
 s2 = SingletonExample()
 assert s1 is s2  # not just s1 == s2
 ```
-Since `s1` and `s2` are actually the same instance, mutating `s1` will similarly mutate `s2`. Note that singleton-ness does _not_ imply that the class is immutable!
+Since `s1` and `s2` are actually the same instance, mutating `s1` will
+similarly mutate `s2`. Note that singleton-ness does _not_ imply that
+the class is immutable!
 ```python
 s1.foo = 'boo'
 print(s2.foo)  # doesn't AttributeError
@@ -112,7 +123,11 @@ class Connection:
 ```
 
 ### Alternatives
-When dealing with only one or two expensive functions and using names at the module namespace is not a problem (_e.g._ if the connection class is in a separate module), then it is simpler to decorate those functions with `@functools.lru_cache`.
+
+When dealing with only one or two expensive functions and using names at
+the module namespace is not a problem (_e.g._ if the connection class is
+in a separate module), then it is simpler to decorate those functions
+with `@functools.lru_cache`.
 ```python
 from functools import lru_cache
 import psycopg2
@@ -233,7 +248,7 @@ initialise one with `Diner()` would result in a `TypeError`.
 
 The basic idea is that `Diner.cook` and `FancyRestaurant.cook` are two different
 methods, each of which is used to construct a new instance of `Food`. This means
-it is possible to create a function that can take any sort of `Food` and 
+it is possible to create a function that can take any sort of `Food` and
 
 The factory pattern is most useful for object-oriented applications: the
 abstraction allows one to create functions that can use any sort of

@@ -125,6 +125,60 @@ def connect(*args, **kwargs):
 
 ## Delegate pattern
 
+In the **delegate** or **delegation pattern**, an object $A$ receives a
+request and _delegates_ the work to some other object $B$, passing
+alongside the _context_ of the request. In other words, $B$ has
+'knowledge' of (at least part of) the state of $A$. This could be done
+perhaps by $A$ including a reference to itself in its request to $B$, or
+perhaps by $B$ having a reference to $A$ as an instance variable.
+
+Consider the following implementation of a particle simulation, in which
+particles exert forces on each other. The `Simulation` object maintains
+a list of `Particle` objects, each of which has an `.update()` method.
+When `simulation.update(dt)` is called, the `.update()` method is called
+on each of the `Particle` objects. To do the update, each `Particle`
+needs to know the forces on it from all the other particles, so it
+maintains a reference to the `Simulation` to which it belongs.
+
+(This is a terrible integration scheme! Don't do it!)
+```python
+class Simulation:
+    def __init__(self, particles):
+        for particle in particles:
+            particle.simulation = self
+
+        self.particles = particles
+        self.time = 0
+
+    def update(self, dt):
+        self.time += dt
+        for particle in self.particles:
+            particle.update(dt)
+
+
+class Particle:
+    def __init__(self):
+        ...  # mass, position, velocity
+        self.simulation = None
+
+    def calculate_force(self):
+        force = (0, 0, 0)
+        for other in self.simulation.particles:
+            if other is self:
+                continue
+
+            # inverse square law
+            displacement = other.position - self.position
+            force += displacement / math.hypot(*displacement) ** 3
+
+        return force
+
+    def update(self, dt):
+        force = self.calculate_force()
+        self.velocity += dt * force / self.mass
+        self.position += dt * self.velocity
+
+```
 
 
 ## Factory pattern

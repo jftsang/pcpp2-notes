@@ -113,7 +113,7 @@ quicksort(lst)
 ```
 
 
-## Example 2: Tee-ing
+## Example 2: Tee
 
 When debugging a function, it's often useful to see its return value, especially
 if this value is then being used somewhere else. The following decorator causes
@@ -246,14 +246,11 @@ different decorators.
 def quicksort(lst):
     ...
 ```
-The decorators are applied in order, with the bottom one first.
+The decorators are applied in order, with the bottom one first. So, the above is equivalent to:
 ```python
 quicksort = timed(tee(quicksort))
 ```
-For these trivial examples the order in which you put the decorators doesn't
-matter very much. However, order matters when the decorations are used to
-register a function. For example, suppose a decorator `@register` is used to
-register functions into a set. The following have different behaviour:
+Order matters when the decorations are used to register a function. For example, suppose a decorator `@register` is used to register functions into a set (*e.g.* in Flask, to add the function as a route for the app). The following have different behaviour:
 ```python
 REGISTRY = set()
 

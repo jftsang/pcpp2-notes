@@ -144,7 +144,7 @@ filtered_squares_iter = map(
 	 filter(predicate, xs)
 )
 ```
-You can use the iterable in a `for` loop or a comprehension.
+You can use the iterator in a `for` loop or a comprehension. Note that iterators get 'exhausted' after looping through them.
 
 Alternatively, the returned object can be converted into a list (or set):
 ```python
